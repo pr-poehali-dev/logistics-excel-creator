@@ -82,7 +82,16 @@ export default function Fleet() {
       rental: 'Own',
       notes: 'Awaiting repair',
     },
-  ];
+  ]);
+  const { toast } = useToast();
+
+  const handleAddVehicle = (newVehicle: any) => {
+    setVehicles([...vehicles, newVehicle]);
+    toast({
+      title: 'Фургон добавлен',
+      description: `${newVehicle.model} (${newVehicle.reg}) успешно добавлен в автопарк.`,
+    });
+  };
 
   const filteredVehicles = vehicles.filter(
     (vehicle) =>

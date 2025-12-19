@@ -77,7 +77,16 @@ export default function Employees() {
       sortCode: '60-00-00',
       rating: 4.7,
     },
-  ];
+  ]);
+  const { toast } = useToast();
+
+  const handleAddEmployee = (newEmployee: any) => {
+    setEmployees([...employees, newEmployee]);
+    toast({
+      title: 'Сотрудник добавлен',
+      description: `${newEmployee.name} успешно добавлен в систему.`,
+    });
+  };
 
   const filteredEmployees = employees.filter(
     (employee) =>
