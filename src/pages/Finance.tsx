@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { exportFinanceToExcel } from '@/utils/exportToExcel';
 import {
   Table,
   TableBody,
@@ -10,6 +11,21 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 
 export default function Finance() {
   const monthlySalaries = [
@@ -39,6 +55,22 @@ export default function Finance() {
   const totalSalaries = monthlySalaries.reduce((sum, emp) => sum + emp.total, 0);
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
+  const monthlyTrend = [
+    { month: 'Авг', expenses: 32000, income: 45000 },
+    { month: 'Сен', expenses: 35000, income: 48000 },
+    { month: 'Окт', expenses: 33000, income: 46000 },
+    { month: 'Ноя', expenses: 38000, income: 50000 },
+    { month: 'Дек', expenses: 36000, income: 52000 },
+    { month: 'Янв', expenses: totalExpenses + totalSalaries, income: 54000 },
+  ];
+
+  const expenseChartData = expenses.map(e => ({
+    name: e.category,
+    value: e.amount,
+  }));
+
+  const COLORS = ['#0ea5e9', '#10b981', '#f97316', '#8b5cf6', '#ec4899', '#f59e0b'];
+
   return (
     <div className="p-8 space-y-6 animate-fade-in">
       {/* Header */}
@@ -48,7 +80,7 @@ export default function Finance() {
           <p className="text-slate-600 mt-1">Управление зарплатами и расходами</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => exportFinanceToExcel(monthlySalaries, expenses, recentTransactions)}>
             <Icon name="Download" size={20} />
             Экспорт
           </Button>
@@ -185,6 +217,118 @@ export default function Finance() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Monthly Trend */}
+        <Card className="border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="TrendingUp" size={20} className="text-sky-500" />
+              Динамика расходов и доходов
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={monthlyTrend}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="month" stroke="#64748b" />
+                <YAxis stroke="#64748b" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="expenses" 
+                  stroke="#f97316" 
+                  strokeWidth={2}
+                  name="Расходы"
+                  dot={{ fill: '#f97316', r: 4 }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="income" 
+                  stroke="#10b981" 
+                  strokeWidth={2}
+                  name="Доходы"
+                  dot={{ fill: '#10b981', r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Expense Distribution Pie */}
+        <Card className="border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="PieChart" size={20} className="text-sky-500" />
+              Распределение расходов
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={expenseChartData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {expenseChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px'
+                  }}
+                  formatter={(value: number) => `£${value.toLocaleString()}`}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Category Expenses Bar Chart */}
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Icon name="BarChart3" size={20} className="text-sky-500" />
+            Сравнение расходов по категориям
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={expenses}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="category" stroke="#64748b" />
+              <YAxis stroke="#64748b" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px'
+                }}
+                formatter={(value: number) => `£${value.toLocaleString()}`}
+              />
+              <Bar dataKey="amount" fill="#0ea5e9" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
 
       {/* Recent Transactions */}
       <Card className="border-0 shadow-lg">

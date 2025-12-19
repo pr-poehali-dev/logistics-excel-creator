@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import AddEmployeeDialog from '@/components/AddEmployeeDialog';
+import { useToast } from '@/hooks/use-toast';
+import { exportEmployeesToExcel } from '@/utils/exportToExcel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,8 +19,8 @@ import {
 
 export default function Employees() {
   const [searchTerm, setSearchTerm] = useState('');
-
-  const employees = [
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [employees, setEmployees] = useState([
     {
       name: 'John Smith',
       status: 'active',
@@ -124,7 +127,7 @@ export default function Employees() {
           <h1 className="text-4xl font-bold text-slate-900">Сотрудники</h1>
           <p className="text-slate-600 mt-1">Управление персоналом и документами</p>
         </div>
-        <Button className="bg-sky-500 hover:bg-sky-600 shadow-lg">
+        <Button className="bg-sky-500 hover:bg-sky-600 shadow-lg" onClick={() => setDialogOpen(true)}>
           <Icon name="UserPlus" size={20} className="mr-2" />
           Добавить сотрудника
         </Button>
@@ -205,7 +208,7 @@ export default function Employees() {
               <Icon name="Filter" size={20} />
               Фильтры
             </Button>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => exportEmployeesToExcel(employees)}>
               <Icon name="Download" size={20} />
               Экспорт
             </Button>
