@@ -124,7 +124,7 @@ export default function Fleet() {
           <h1 className="text-4xl font-bold text-slate-900">Автопарк</h1>
           <p className="text-slate-600 mt-1">Управление фургонами и техобслуживанием</p>
         </div>
-        <Button className="bg-sky-500 hover:bg-sky-600 shadow-lg">
+        <Button className="bg-sky-500 hover:bg-sky-600 shadow-lg" onClick={() => setDialogOpen(true)}>
           <Icon name="Plus" size={20} className="mr-2" />
           Добавить фургон
         </Button>
@@ -149,7 +149,7 @@ export default function Fleet() {
               <Icon name="Filter" size={20} />
               Фильтры
             </Button>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => exportFleetToExcel(vehicles)}>
               <Icon name="Download" size={20} />
               Экспорт
             </Button>
