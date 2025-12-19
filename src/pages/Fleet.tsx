@@ -15,8 +15,8 @@ import {
 
 export default function Fleet() {
   const [searchTerm, setSearchTerm] = useState('');
-
-  const vehicles = [
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [vehicles, setVehicles] = useState([
     {
       reg: 'AB12 CDE',
       model: 'Mercedes Sprinter',
